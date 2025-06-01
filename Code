@@ -1,0 +1,77 @@
+#include <DHT.h>
+#include <ESP8266WiFi.h>
+
+// Define sensor pins
+#define DHTPIN D3
+#define MOISTURE_PIN A0
+#define MOTOR_PIN D0
+
+// Define WiFi credentials
+const char* ssid = "YOUR_WIFI_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
+
+// Define soil moisture threshold
+const int moistureThreshold = 30;
+
+// Define the pump's on/off states
+const int pumpOn = LOW;
+const int pumpOff = HIGH;
+
+// Initialize DHT sensor
+DHT dht(DHTPIN, DHT11);
+
+// WiFiClient object
+WiFiClient client;
+
+// Function to read soil moisture
+float getSoilMoisture() {
+  int moistureValue = analogRead(MOISTURE_PIN);
+  // Map the sensor reading to a percentage (0-100)
+  return map(moistureValue, 0, 1023, 100, 0);
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  // Configure pins
+  pinMode(MOTOR_PIN, OUTPUT);
+
+  // Connect to WiFi
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("Connected to WiFi");
+
+  // Initialize DHT sensor
+  dht.begin();
+
+  // Turn pump off initially
+  digitalWrite(MOTOR_PIN, pumpOff);
+}
+
+void loop() {
+  // Read soil moisture
+  float moisture = getSoilMoisture();
+
+  // Print soil moisture to serial monitor
+  Serial.print("Moisture: ");
+  Serial.print(moisture);
+  Serial.println("%");
+
+  // Check if soil moisture is below the threshold
+  if (moisture < moistureThreshold) {
+    // Turn the pump on
+    Serial.println("Pump ON");
+    digitalWrite(MOTOR_PIN, pumpOn);
+    delay(5000); // Keep the pump on for 5 seconds
+    digitalWrite(MOTOR_PIN, pumpOff);
+    Serial.println("Pump OFF");
+  } else {
+    // Turn the pump off (if it's already on)
+    Serial.println("Pump OFF (already off or moisture level sufficient)");
+    digitalWrite(MOTOR_PIN, pumpOff);
+  }
+  delay(2000);
+}
