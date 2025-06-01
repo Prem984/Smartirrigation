@@ -1,4 +1,4 @@
-# Smart Irrigation
+# Smart Irrigation Using IOT
 Smart Irrigation using IoT
 A smart irrigation system using IoT leverages sensors, microcontrollers, and cloud connectivity to automate water delivery based on real-time soil moisture conditions. The core of such a system involves reading soil moisture data, making decisions based on pre-defined thresholds, and controlling a water pump or valve. 
 Here's a more detailed breakdown of the components and code involved:
